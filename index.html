@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE LORE: LEVEL UP</title>
+    <style>
+        :root {
+            --bg: #050508;
+            --neon-blue: #00d2ff;
+            --gold: #f8ef02;
+            --pink: #ff0055;
+            --white: #ffffff;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--white);
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            background: radial-gradient(circle at center, #10182b 0%, #050508 100%);
+        }
+
+        .container { text-align: center; z-index: 10; width: 100%; }
+
+        h1 {
+            font-size: 2.2rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 5px;
+            text-shadow: 0 0 15px var(--neon-blue);
+        }
+
+        .xp-bar {
+            width: 200px;
+            height: 6px;
+            background: #222;
+            margin: 10px auto 40px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #444;
+        }
+
+        #progress {
+            width: 0%;
+            height: 100%;
+            background: var(--neon-blue);
+            box-shadow: 0 0 10px var(--neon-blue);
+            transition: width 0.3s;
+        }
+
+        /* The Box */
+        .gift-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            margin-bottom: 50px;
+        }
+
+        .gift-box {
+            font-size: 90px;
+            filter: drop-shadow(0 0 20px var(--neon-blue));
+            transition: 0.1s;
+        }
+
+        .gift-wrapper:active .gift-box { transform: scale(0.9); }
+
+        /* Power Orb */
+        .orb {
+            width: 190px;
+            height: 190px;
+            border-radius: 50%;
+            background: rgba(0, 210, 255, 0.05);
+            border: 2px solid var(--neon-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px var(--neon-blue);
+            cursor: pointer;
+            margin: 0 auto;
+        }
+
+        .orb-text {
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 15px;
+            line-height: 1.4;
+        }
+
+        /* The Inside Joke Popups */
+        .popup {
+            position: absolute;
+            pointer-events: none;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--neon-blue);
+            padding: 10px 18px;
+            border-radius: 4px;
+            font-weight: 600;
+            color: white;
+            z-index: 1000;
+            white-space: nowrap;
+            animation: emerge 1.2s ease-out forwards;
+        }
+
+        @keyframes emerge {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            20% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+            100% { transform: translate(-50%, -120px) scale(1); opacity: 0; }
+        }
+
+        /* Special Anime Firework */
+        .spark {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            pointer-events: none;
+            animation: explode 0.8s ease-out forwards;
+        }
+
+        @keyframes explode {
+            to { transform: translate(var(--x), var(--y)); opacity: 0; }
+        }
+
+        .shake { animation: shake 0.4s ease; }
+        @keyframes shake {
+            0%, 100% { transform: translate(0,0); }
+            25% { transform: translate(-4px, 4px); }
+            75% { transform: translate(4px, -4px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>THE ULTIMATE DUO</h1>
+        <div class="xp-bar"><div id="progress"></div></div>
+
+        <div class="gift-wrapper" onclick="handleTap(event)">
+            <div class="gift-box" id="main-icon">🎁</div>
+        </div>
+
+        <div class="orb" id="orb" onclick="handleOrb(event)">
+            <div class="orb-text" id="orb-display">LOAD STATS</div>
+        </div>
+    </div>
+
+    <script>
+        let taps = 0;
+        let isSecretMode = false;
+
+        // HEARTFELT TEXTS
+        const loveTexts = [
+            "You're my safe place. 🛡️",
+            "Proud of the man you are. 👑",
+            "Every day is a win with you. 🏆",
+            "My whole heart, forever. ❤️",
+            "Life is better with you. ✨",
+            "The strongest man I know. ⚔️",
+            "Your biggest fan, always. 📣",
+            "My once-in-a-lifetime. 💎"
+        ];
+
+        // INSIDE JOKES (Replace these with yours!)
+        const insideJokes = [
+            "Remember [Inside Joke 1]? 😂",
+            "Still the [Funny Nickname] king.",
+            "That one time at [Place Name]... 📍",
+            "Our 2:00 AM [Food Name] runs. 🍔",
+            "Stop being so [Random Habit]! lol",
+            "You + Me + [Activity] = Chaos. ⚡",
+            "The legend of the [Secret Story] continues."
+        ];
+
+        // ORB STATS
+        const stats = [
+            "FOREVER HOME",
+            "ULTIMATE PRIORITY",
+            "LOVE STATUS: INFINITE",
+            "PERFECT MATCH",
+            "WORLD'S BEST PARTNER",
+            "MY CONSTANT",
+            "BLESSED TO HAVE YOU",
+            "MY HEART'S CAPTAIN"
+        ];
+
+        function spawnFX(x, y, color) {
+            for (let i = 0; i < 12; i++) {
+                const s = document.createElement('div');
+                s.className = 'spark';
+                s.style.background = color;
+                s.style.left = x + 'px';
+                s.style.top = y + 'px';
+                s.style.setProperty('--x', (Math.random() - 0.5) * 250 + 'px');
+                s.style.setProperty('--y', (Math.random() - 0.5) * 250 + 'px');
+                document.body.appendChild(s);
+                setTimeout(() => s.remove(), 800);
+            }
+        }
+
+        function handleTap(e) {
+            taps++;
+            let pool = isSecretMode ? insideJokes : loveTexts;
+            let currentMsg = pool[Math.floor(Math.random() * pool.length)];
+
+            // Update Progress Bar
+            if(taps <= 10) document.getElementById('progress').style.width = (taps * 10) + "%";
+
+            // Create Popup
+            const p = document.createElement('div');
+            p.className = 'popup';
+            p.innerHTML = currentMsg;
+            p.style.left = e.clientX + 'px';
+            p.style.top = e.clientY + 'px';
+            document.body.appendChild(p);
+            
+            spawnFX(e.clientX, e.clientY, isSecretMode ? '#f8ef02' : '#00d2ff');
+            setTimeout(() => p.remove(), 1200);
+
+            // Unlock Secret Mode
+            if (taps === 10) {
+                document.getElementById('main-icon').innerText = "💖";
+                isSecretMode = true;
+                document.getElementById('progress').style.background = "#ff0055";
+                alert("COMBO UNLOCKED: Inside Joke Mode Active! Keep tapping for the deep lore...");
+            }
+        }
+
+        function handleOrb(e) {
+            const orb = document.getElementById('orb');
+            const display = document.getElementById('orb-display');
+            orb.classList.add('shake');
+            spawnFX(e.clientX, e.clientY, '#ff0055');
+
+            setTimeout(() => {
+                orb.classList.remove('shake');
+                display.innerText = stats[Math.floor(Math.random() * stats.length)];
+            }, 400);
+        }
+    </script>
+</body>
+</html>
