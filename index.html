@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>THE SOVEREIGN: B-DAY</title>
+    <style>
+        :root {
+            --red: #ff003c;
+            --cyan: #00f2ff;
+            --gold: #f8ef02;
+        }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background: #000; overflow: hidden;
+            font-family: 'Arial Black', sans-serif;
+        }
+
+        #stage {
+            width: 100vw; height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; overflow: hidden;
+        }
+
+        /* Ambient Energy Background */
+        .bg-glow {
+            position: absolute; width: 100%; height: 100%;
+            background: radial-gradient(circle, #1a0000 0%, #000 100%);
+            z-index: 1;
+        }
+
+        /* GIANT KANJI: BOND (絆) */
+        .kanji-bg {
+            position: absolute; font-size: 50vw; color: rgba(255, 0, 60, 0.03);
+            z-index: 2; pointer-events: none; font-weight: 900;
+            user-select: none;
+        }
+
+        /* THE CORE (The Trigger) */
+        #core {
+            width: 120px; height: 120px;
+            background: white; border-radius: 50%;
+            z-index: 100; cursor: pointer;
+            box-shadow: 0 0 50px white, 0 0 100px var(--red);
+            display: flex; align-items: center; justify-content: center;
+            animation: breathe 2s infinite ease-in-out;
+            border: none; outline: none;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 30px white; }
+            50% { transform: scale(1.15); box-shadow: 0 0 60px var(--red); }
+        }
+
+        /* FULL SCREEN IMPACT SLASH */
+        .slash {
+            position: absolute; width: 300%; height: 20px;
+            background: white; z-index: 200;
+            box-shadow: 0 0 40px var(--cyan), 0 0 80px white;
+            transform-origin: center;
+            pointer-events: none;
+            animation: slash-action 0.3s ease-out forwards;
+        }
+
+        @keyframes slash-action {
+            0% { transform: translate(-50%, -50%) rotate(var(--r)) scaleX(0); opacity: 1; }
+            100% { transform: translate(-50%, -50%) rotate(var(--r)) scaleX(1); opacity: 0; }
+        }
+
+        /* MASSIVE CINEMATIC TEXT */
+        .impact-text {
+            position: absolute; width: 100%; text-align: center;
+            font-size: 14vw; line-height: 0.8; font-weight: 900;
+            z-index: 300; pointer-events: none;
+            -webkit-text-stroke: 2px #fff; color: transparent;
+            text-shadow: 8px 8px var(--red);
+            animation: impact-anim 0.9s cubic-bezier(0.13, 0.9, 0.22, 1) forwards;
+        }
+
+        @keyframes impact-anim {
+            0% { transform: scale(4) rotate(15deg); filter: blur(30px); opacity: 0; }
+            20% { transform: scale(1) rotate(0deg); filter: blur(0px); opacity: 1; }
+            80% { transform: scale(1); opacity: 1; filter: blur(0px); }
+            100% { transform: scale(0.7) translateY(-100px); opacity: 0; filter: blur(20px); }
+        }
+
+        /* FINAL DESTINY CARD */
+        #final-screen {
+            position: absolute; inset: 0; background: #000;
+            display: none; flex-direction: column; align-items: center;
+            justify-content: center; z-index: 1000; text-align: center;
+            animation: fadeIn 2s ease-in forwards;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .bday-title {
+            font-size: 10vw; color: #fff; margin: 0;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            filter: drop-shadow(0 0 20px var(--red));
+        }
+
+        .restart-btn {
+            margin-top: 40px; padding: 18px 50px;
+            background: white; color: black; border: none;
+            font-weight: 900; letter-spacing: 4px; cursor: pointer;
+            text-transform: uppercase;
+            clip-path: polygon(5% 0, 100% 0, 95% 100%, 0% 100%);
+            transition: 0.3s;
+        }
+
+        .restart-btn:hover { background: var(--cyan); transform: scale(1.05); }
+
+        .shake { animation: screen-shake 0.15s infinite; }
+        @keyframes screen-shake {
+            0% { transform: translate(5px, 5px); }
+            50% { transform: translate(-5px, -5px); }
+            100% { transform: translate(0, 0); }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bass-drop" preload="auto">
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="stage">
+        <div class="bg-glow"></div>
+        <div class="kanji-bg">絆</div> 
+        
+        <div id="core" onclick="strike(event)">
+            <span style="color:black; font-size: 0.7rem; letter-spacing: 2px;">STRIKE</span>
+        </div>
+
+        <div id="text-layer"></div>
+    </div>
+
+    <div id="final-screen">
+        <h2 style="color:var(--gold); letter-spacing: 12px; font-size: 0.7rem; margin-bottom: 10px;">LEVEL: SOVEREIGN</h2>
+        <h1 class="bday-title">HAPPY BIRTHDAY</h1>
+        <div style="width: 80px; height: 2px; background: white; margin: 25px 0;"></div>
+        <p style="color:#ccc; max-width: 80%; line-height: 1.6; font-size: 1.1rem; font-weight: 300;">
+            TO THE MAN WHO OWNS MY SOUL. <br>
+            MY LIFE PARTNER. MY GREATEST VICTORY. <br>
+            <span style="color:white; font-weight: 900;">I LOVE YOU BEYOND ALL LIMITS.</span>
+        </p>
+        <button class="restart-btn" onclick="location.reload()">RESTART JOURNEY</button>
+    </div>
+
+    <script>
+        const lore = [
+            "YOU OWN MY SOUL ⚔️",
+            "THE MAN. THE LEGEND. 👑",
+            "UNSTOPPABLE TOGETHER 🛡️",
+            "MY ULTIMATE PRIORITY 💎",
+            "MY SAFE HARBOR ⚓",
+            "FOREVER MY HERO 🔥",
+            "MY HEART'S KING 👑",
+            "BORN TO RULE AS ONE 🛡️",
+            "ENDLESS LOVE ❤️",
+            "LEVEL: GOD STATUS 🏆"
+        ];
+
+        let count = 0;
+        const audio = document.getElementById('bass-drop');
+
+        function strike(e) {
+            // Play Audio on First Strike
+            if (count === 0) {
+                audio.volume = 0.6;
+                audio.play();
+            }
+
+            const textLayer = document.getElementById('text-layer');
+            
+            // 1. Visual Slash
+            const slash = document.createElement('div');
+            slash.className = 'slash';
+            slash.style.setProperty('--r', (Math.random() * 360) + 'deg');
+            slash.style.top = e.clientY + 'px';
+            slash.style.left = e.clientX + 'px';
+            document.body.appendChild(slash);
+            setTimeout(() => slash.remove(), 300);
+
+            // 2. Cinematic Impact Text
+            textLayer.innerHTML = '';
+            const t = document.createElement('div');
+            t.className = 'impact-text';
+            t.innerText = lore[count % lore.length];
+            textLayer.appendChild(t);
+
+            // 3. Screen Shake
+            document.body.classList.add('shake');
+            setTimeout(() => document.body.classList.remove('shake'), 150);
+
+            count++;
+
+            // 4. Climax Transition
+            if (count === lore.length) {
+                setTimeout(() => {
+                    document.getElementById('final-screen').style.display = 'flex';
+                }, 1200);
+            }
+        }
+    </script>
+</body>
+</html>
