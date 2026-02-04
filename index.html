@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>SAI: SOVEREIGN OVERDRIVE</title>
+    <style>
+        :root {
+            --neon-blue: #00f2fe;
+            --neon-pink: #ff0055;
+            --white: #ffffff;
+        }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background: #000; overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* START OVERLAY - iOS Optimized */
+        #overlay {
+            position: fixed; inset: 0; background: #000; 
+            z-index: 5000; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        #viewport {
+            width: 100vw; height: 100vh;
+            transition: transform 0.1s ease-out;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* 3D ROAD - iOS METAL VIBE */
+        .road {
+            position: absolute; bottom: -50%; width: 500%; height: 200%;
+            background: 
+                linear-gradient(90deg, transparent 49.8%, var(--neon-blue) 50%, transparent 50.2%),
+                linear-gradient(0deg, transparent 24%, rgba(0, 242, 254, 0.15) 25%, transparent 26%);
+            background-size: 100px 100px;
+            transform: rotateX(80deg);
+            animation: moveRoad 0.2s linear infinite;
+            z-index: 1;
+        }
+        @keyframes moveRoad { to { background-position: 0 100px; } }
+
+        /* THE RIDER - SAI'S SHIP */
+        #rider {
+            position: absolute; bottom: 15%; width: 65px; height: 100px;
+            background: var(--white);
+            box-shadow: 0 0 40px var(--neon-blue), 0 0 70px var(--neon-pink);
+            z-index: 100; transition: left 0.1s cubic-bezier(0.1, 0.5, 0.5, 1);
+            clip-path: polygon(50% 0%, 100% 100%, 50% 85%, 0% 100%);
+        }
+
+        /* SCREEN SHAKE (For iPhone "Haptics") */
+        .shake { animation: shakeAnim 0.2s ease-in-out; }
+        @keyframes shakeAnim {
+            0% { transform: translate(2px, 1px) rotate(0deg); }
+            20% { transform: translate(-1px, -2px) rotate(-1deg); }
+            40% { transform: translate(-3px, 0px) rotate(1deg); }
+            60% { transform: translate(3px, 2px) rotate(0deg); }
+            80% { transform: translate(1px, -1px) rotate(1deg); }
+            100% { transform: translate(0, 0) rotate(0deg); }
+        }
+
+        /* TEXT IMPACT */
+        .impact-msg {
+            position: absolute; width: 90vw; left: 5vw; top: 35%;
+            text-align: center; font-size: 12vw; font-weight: 900;
+            z-index: 1000; pointer-events: none; opacity: 0;
+            color: var(--white); line-height: 0.9;
+            text-shadow: 0 0 30px var(--neon-pink);
+            text-transform: uppercase;
+        }
+        .boost-anim { animation: boostEffect 1.3s cubic-bezier(0.1, 0.9, 0.2, 1) forwards; }
+        @keyframes boostEffect {
+            0% { transform: scale(3) rotate(5deg); opacity: 0; filter: blur(20px); }
+            15% { transform: scale(1) rotate(0deg); opacity: 1; filter: blur(0px); }
+            100% { transform: translateY(-80px) scale(0.8); opacity: 0; }
+        }
+
+        #final-screen {
+            position: fixed; inset: 0; background: #000; z-index: 4000;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 20px;
+        }
+    </style>
+</head>
+<body onclick="ignite()">
+
+<div id="overlay">
+    <div style="border: 1px solid var(--neon-blue); padding: 40px; text-align: center;">
+        <h1 style="letter-spacing: 20px; font-size: 3rem; color: #fff; margin: 0;">SAI</h1>
+        <p style="color: var(--neon-blue); font-size: 10px; letter-spacing: 5px; margin-top: 10px;">SYSTEM: ACTIVE</p>
+        <button style="margin-top: 40px; padding: 15px 50px; background: #fff; border: none; font-weight: 900; letter-spacing: 2px; cursor: pointer;">IGNITE ENGINE</button>
+    </div>
+</div>
+
+<audio id="bgm" preload="auto" loop>
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3" type="audio/mpeg">
+</audio>
+
+<div id="viewport">
+    <div id="game-container">
+        <div class="road"></div>
+        <div id="rider" style="left: calc(50% - 32px);"></div>
+        <div id="text-layer"></div>
+        
+        <div style="position: absolute; top: 10%; width: 100%; text-align: center; z-index: 200;">
+            <div id="meter" style="font-size: 2.5rem; color: #fff; opacity: 0.3; font-weight: 100;">0%</div>
+        </div>
+    </div>
+</div>
+
+<div id="final-screen">
+    <h1 style="font-size: 13vw; color: #fff; text-shadow: 0 0 30px var(--neon-pink);">HAPPY BIRTHDAY</h1>
+    <p style="max-width: 85%; line-height: 2; color: #ccc; font-size: 1.1rem;">
+        To the man who owns my world.<br>
+        My victory, my peace, my soul.<br><br>
+        <b style="color:#fff; font-size: 1.5rem;">I LOVE YOU, SAI.</b>
+    </p>
+    <button onclick="location.reload()" style="background: var(--neon-blue); padding: 15px 40px; border: none; font-weight: bold; margin-top: 30px; color: #000;">REPLAY</button>
+</div>
+
+<script>
+    const lines = [
+        "YOU FUEL MY SOUL 🔥",
+        "I'M SO PROUD OF YOU 👑",
+        "MY FOREVER HOME 🏠",
+        "YOU DRIVE ME CRAZY... 😉",
+        "MY HEART ACCELERATES 💓",
+        "I'LL ALWAYS BE YOURS 💍",
+        "MY ONCE IN A LIFETIME ✨",
+        "MY EVERYTHING. SAI. ❤️"
+    ];
+
+    let index = 0;
+    let started = false;
+    const viewport = document.getElementById('viewport');
+    const rider = document.getElementById('rider');
+    const bgm = document.getElementById('bgm');
+
+    function ignite() {
+        if(!started) { 
+            bgm.play().catch(e => console.log("Audio play blocked")); 
+            document.getElementById('overlay').style.display = 'none';
+            started = true;
+            setInterval(spawn, 1500); 
+        }
+    }
+
+    const move = (e) => {
+        if(!started) return;
+        let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        let x = clientX - 32;
+        rider.style.left = Math.max(10, Math.min(x, window.innerWidth - 75)) + 'px';
+    };
+    window.addEventListener('mousemove', move);
+    window.addEventListener('touchmove', move, { passive: false });
+
+    function spawn() {
+        if (index >= lines.length) return;
+        const h = document.createElement('div');
+        h.style.cssText = `position:absolute; top:-100px; left:${Math.random()*80}vw; font-size:50px; z-index:50; transition: top 1.3s linear; pointer-events:none;`;
+        h.innerHTML = '❤️';
+        document.getElementById('game-container').appendChild(h);
+        setTimeout(() => h.style.top = '110vh', 10);
+
+        const check = setInterval(() => {
+            const r = rider.getBoundingClientRect();
+            const hR = h.getBoundingClientRect();
+            if (hR.bottom >= r.top && hR.left < r.right && hR.right > r.left) {
+                impact();
+                h.remove();
+                clearInterval(check);
+            }
+        }, 30);
+    }
+
+    function impact() {
+        // iOS "Vibe" - Visual Shake + Camera Tilt
+        viewport.classList.add('shake');
+        const tilt = (Math.random() - 0.5) * 30;
+        viewport.style.transform = `rotate(${tilt}deg) scale(1.2)`;
+        
+        setTimeout(() => {
+            viewport.classList.remove('shake');
+            viewport.style.transform = `rotate(0deg) scale(1)`;
+        }, 200);
+
+        // Text display
+        const m = document.createElement('div');
+        m.className = 'impact-msg boost-anim';
+        m.innerText = lines[index];
+        document.getElementById('text-layer').innerHTML = '';
+        document.getElementById('text-layer').appendChild(m);
+
+        index++;
+        document.getElementById('meter').innerText = Math.floor((index/lines.length)*100) + "%";
+        
+        if (index === lines.length) {
+            setTimeout(() => document.getElementById('final-screen').style.display = 'flex', 2000);
+        }
+    }
+</script>
+</body>
+</html>
