@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>FOR SAI</title>
+    <style>
+        :root {
+            --neon-cyan: #00f2fe;
+            --white: #ffffff;
+            --grid-line: rgba(255, 255, 255, 0.1);
+        }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background: #000; overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #game-container {
+            position: relative; width: 100vw; height: 100vh;
+            perspective: 1200px; background: #000;
+        }
+
+        /* CLEAN LIGHT-DESIGN GRID */
+        .road {
+            position: absolute; bottom: -50%; width: 600%; height: 250%;
+            background-image: 
+                linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+            background-size: 80px 80px;
+            transform: rotateX(80deg) translateX(-42%);
+            animation: moveRoad 0.8s linear infinite;
+        }
+        @keyframes moveRoad { to { background-position: 0 80px; } }
+
+        /* THE SHIP - 1:1 PRECISION TRACKING */
+        #rider {
+            position: absolute; bottom: 15%; width: 42px; height: 68px;
+            background: #fff; box-shadow: 0 0 30px #fff;
+            z-index: 100; pointer-events: none;
+            clip-path: polygon(50% 0%, 100% 100%, 50% 88%, 0% 100%);
+            transform: translateX(-50%);
+        }
+
+        /* MESSAGE STAGE */
+        #text-stage {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            pointer-events: none; z-index: 1000; padding: 20px;
+        }
+
+        .impact-msg {
+            position: relative; text-align: center; font-size: 7.5vw;
+            font-weight: 200; color: #fff; letter-spacing: 3px;
+            text-transform: uppercase; opacity: 0;
+            text-shadow: 0 0 20px rgba(255,255,255,0.6);
+            line-height: 1.2;
+        }
+
+        .text-reveal { animation: textAnim 2.6s ease-out forwards; }
+        @keyframes textAnim {
+            0% { transform: scale(0.85); filter: blur(15px); opacity: 0; }
+            12% { transform: scale(1); filter: blur(0px); opacity: 1; }
+            85% { opacity: 1; filter: blur(0px); }
+            100% { transform: scale(1.05); opacity: 0; filter: blur(10px); }
+        }
+
+        #vfx-canvas { position: absolute; inset: 0; z-index: 950; pointer-events: none; }
+
+        /* OPENING SCREEN */
+        #overlay {
+            position: fixed; inset: 0; background: #000; z-index: 5000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .main-t { font-size: 3.2rem; letter-spacing: 15px; color: #fff; font-weight: 100; margin: 0; }
+        .sub-t { font-size: 0.7rem; letter-spacing: 4px; color: rgba(255,255,255,0.4); margin-top: 15px; }
+        .ignite-btn {
+            background: #fff; border: none; color: #000; margin-top: 60px;
+            padding: 20px 55px; font-size: 0.8rem; letter-spacing: 5px;
+            cursor: pointer; font-weight: 600; border-radius: 50px;
+        }
+
+        /* FINAL LETTER */
+        #final-screen {
+            position: fixed; inset: 0; background: #000; z-index: 4000;
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            color: #fff; text-align: center; padding: 40px;
+        }
+    </style>
+</head>
+<body onclick="launch()">
+
+<div id="overlay">
+    <h1 class="main-t">FOR SAI</h1>
+    <div class="sub-t">EVERY ROAD LEADS ME BACK TO YOU</div>
+    <button class="ignite-btn">BEGIN OUR JOURNEY</button>
+</div>
+
+<audio id="bgm" loop><source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3" type="audio/mpeg"></audio>
+
+<div id="game-container">
+    <canvas id="vfx-canvas"></canvas>
+    <div class="road"></div>
+    <div id="rider" style="left: 50%;"></div>
+    <div id="text-stage"></div>
+</div>
+
+<div id="final-screen">
+    <h1 style="font-size: 1.4rem; font-weight: 100; letter-spacing: 8px; margin-bottom: 25px;">HAPPY BIRTHDAY, SAI</h1>
+    <p style="max-width: 90%; line-height: 2.2; opacity: 0.9; font-weight: 300; font-size: 0.95rem; font-style: italic;">
+        "They say life is a race, but with you, I’ve already won. Thank you for being my strength when I’m tired and my light when things get dark. You aren't just the man I love; you are the man I admire most."
+    </p>
+    <p style="margin-top: 40px; letter-spacing: 3px; font-weight: 500; font-size: 0.75rem; color: var(--neon-cyan);">YOU ARE MY ONCE IN A LIFETIME. ALWAYS.</p>
+    <button onclick="location.reload()" style="background:none; border: 1px solid rgba(255,255,255,0.2); color:#fff; padding:12px 30px; margin-top:40px; border-radius: 30px; font-size: 0.6rem;">REPLAY OUR STORY</button>
+</div>
+
+<script>
+    const lines = [
+        "YOU’RE MY FAVORITE NOTIFICATION",
+        "ARE YOU A CAMERA? I SMILE EVERY TIME I SEE YOU",
+        "MY HEART ONLY BEATS IN YOUR DIRECTION",
+        "A GUY LIKE YOU IS IMPOSSIBLE TO FIND",
+        "YOU’RE THE BEST PART OF EVERY DAY",
+        "I LOVE YOU MORE THAN COFFEE...",
+        "STILL MY ONCE IN A LIFETIME",
+        "MY FOREVER STARTS & ENDS WITH YOU"
+    ];
+
+    let index = 0; let started = false;
+    const canvas = document.getElementById('vfx-canvas');
+    const ctx = canvas.getContext('2d');
+    const rider = document.getElementById('rider');
+    let particles = [];
+
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    window.addEventListener('resize', resize); resize();
+
+    class Particle {
+        constructor(x, y, color) {
+            this.x = x; this.y = y; this.color = color;
+            this.size = Math.random() * 2 + 0.5;
+            this.speedX = (Math.random() - 0.5) * 14;
+            this.speedY = (Math.random() - 0.5) * 14;
+            this.alpha = 1;
+        }
+        update() { this.x += this.speedX; this.y += this.speedY; this.alpha -= 0.009; }
+        draw() {
+            ctx.globalAlpha = this.alpha;
+            ctx.fillStyle = this.color;
+            ctx.shadowBlur = 12; ctx.shadowColor = this.color;
+            ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+        }
+    }
+
+    function fullScreenFireworks() {
+        const colors = ['#ffffff', '#00f2fe', '#ffd700', '#ff0055'];
+        for(let burst = 0; burst < 6; burst++) {
+            const startX = Math.random() * window.innerWidth;
+            const startY = Math.random() * window.innerHeight;
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            for(let i=0; i<35; i++) {
+                particles.push(new Particle(startX, startY, color));
+            }
+        }
+    }
+
+    function loop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles = particles.filter(p => p.alpha > 0);
+        particles.forEach(p => { p.update(); p.draw(); });
+        requestAnimationFrame(loop);
+    }
+
+    function launch() {
+        if(!started) {
+            document.getElementById('bgm').play().catch(()=>{});
+            document.getElementById('overlay').style.display = 'none';
+            started = true; loop(); setInterval(spawn, 1900);
+        }
+    }
+
+    const move = (e) => {
+        if(!started) return;
+        let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        rider.style.left = clientX + 'px';
+    };
+    window.addEventListener('mousemove', move);
+    window.addEventListener('touchmove', (e) => { move(e); e.preventDefault(); }, {passive: false});
+
+    function spawn() {
+        if (index >= lines.length) return;
+        const h = document.createElement('div');
+        h.style.cssText = `position:absolute; top:-60px; left:${15+Math.random()*70}vw; font-size:35px; transition:top 1.3s linear; pointer-events:none;`;
+        h.innerHTML = '🤍';
+        document.getElementById('game-container').appendChild(h);
+        setTimeout(() => h.style.top = '110vh', 10);
+
+        const check = setInterval(() => {
+            const r = rider.getBoundingClientRect();
+            const hR = h.getBoundingClientRect();
+            if (hR.bottom >= r.top && hR.left < r.right && hR.right > r.left) {
+                fullScreenFireworks(); 
+                const m = document.createElement('div');
+                m.className = 'impact-msg text-reveal';
+                m.innerText = lines[index++];
+                document.getElementById('text-stage').innerHTML = '';
+                document.getElementById('text-stage').appendChild(m);
+                h.remove(); clearInterval(check);
+                if(index === lines.length) setTimeout(()=>document.getElementById('final-screen').style.display='flex', 3000);
+            }
+        }, 30);
+    }
+</script>
+</body>
+</html>
